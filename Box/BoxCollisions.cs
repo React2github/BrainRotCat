@@ -48,6 +48,7 @@ public class BoxCollisions : MonoBehaviour
                     PlayerCollisions.lives--;
                     playerCollisions.UpdateLivesUI();
             }
+            Debug.Log(boxSpawner + "is this null?");
 
             if (boxSpawner != null)
             {
@@ -56,7 +57,8 @@ public class BoxCollisions : MonoBehaviour
 
             if (PlayerCollisions.lives <= 0)
             {
-                gameManager.GameOver();
+                PlayerCollisions.lives = 0;
+                // gameManager.GameOver();
             }
 
         }

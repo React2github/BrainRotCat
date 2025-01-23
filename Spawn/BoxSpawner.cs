@@ -10,31 +10,33 @@ public class BoxSpawner : MonoBehaviour
     public int maxBoxesPerSpawn = 2; // Maximum number of boxes to spawn at once
     private PlayerBorder playerBorder;  // Reference to PlayerBorder to get screen edges
     public static float timer;
-    public int activeBoxCount = 0; 
+
     void Start()
     {
         playerBorder = FindObjectOfType<PlayerBorder>();
     }
+
     void Update()
     {
         timer += Time.deltaTime;
         IsAnyBoxOnScreen();
 
         GameObject[] allBoxes = GameObject.FindGameObjectsWithTag("boxPrefab");
-        activeBoxCount = allBoxes.Length;
-        Debug.Log("Active box count: " + activeBoxCount);
+        Debug.Log("Active box count: " + allBoxes.Length);
+
+
         // Debug.Log("Timer: " + timer);
 
         // Check if any boxPrefab is on screen and only spawn if none are present
         if (timer >= spawnInterval && !IsAnyBoxOnScreen())
         {
-            Debug.Log("Spawning new boxes" + activeBoxCount);
+            Debug.Log("Spawning new boxes");
             // SpawnBoxes();
             timer = 0f;  // Reset timer after spawning
         }
         else
         {
-            Debug.Log("Boxes are still on screen" + activeBoxCount);
+            Debug.Log("Boxes are still on screen");
         }
     }
 
@@ -79,7 +81,8 @@ public class BoxSpawner : MonoBehaviour
                 // Instantiate the new boxPrefab at the random position
                 GameObject newBox = Instantiate(boxPrefab, new Vector2(spawnX, spawnHeight), Quaternion.identity);
                 // Randomly select a box type
-                BoxType type = (BoxType)Random.Range(0, System.Enum.GetValues(typeof(BoxType)).Length); 
+                newBox.tag = "boxPrefab"; // Add tag to the new boxPrefab
+                BoxType type = (BoxType)Random.Range(0, System.Enum.GetValues(typeof(BoxType)).Length);
 
                 SpriteRenderer spriteRenderer = newBox.GetComponent<SpriteRenderer>();
                 switch (type)
@@ -113,19 +116,26 @@ public class BoxSpawner : MonoBehaviour
     {
         if (gameObject != null)
         {
+            gameObject.tag = "Untagged"; // Remove from "boxPrefab" tag to exclude from future searches
             Destroy(gameObject); // Destroy the boxPrefab
-            activeBoxCount--; // Decrement the active box count
-        } else {
-            Debug.LogError("BoxPrefab is null!" + gameObject);
+            Debug.Log("Box destroyed.");
         }
-        Debug.Log("Box count is now: " + activeBoxCount);
-
-        if (!IsAnyBoxOnScreen() && activeBoxCount == 0)   
+        else
         {
-            Debug.Log("No active boxes, spawning a new box...");
-            SpawnBoxes(); // Call SpawnBoxes to spawn new box if no active boxes
+            Debug.LogError("BoxPrefab is null!");
+        }
+
+        // Dynamically count active boxes
+        int boxCount = GameObject.FindGameObjectsWithTag("boxPrefab").Length;
+        Debug.Log("Updated active box count: " + boxCount);
+
+        if (boxCount == 0)
+        {
+            Debug.Log("No active boxes, spawning new boxes...");
+            SpawnBoxes(); // Spawn new boxes
         }
     }
+
 
     private void EnableBoxComponents(GameObject boxPrefab)
     {
@@ -145,7 +155,7 @@ public class BoxSpawner : MonoBehaviour
         BoxCollider2D boxCollider = boxPrefab.GetComponent<BoxCollider2D>();
         if (boxCollider != null)
         {
-            boxCollider.enabled = true;  
+            boxCollider.enabled = true;
         }
     }
 }

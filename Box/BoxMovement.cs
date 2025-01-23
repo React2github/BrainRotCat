@@ -9,6 +9,7 @@ public class BoxMovement : MonoBehaviour
     private float screenBottom;
     private float screenTop;
     private BoxCollisions boxCollisions;
+    private BoxSpawner boxSpawner;
 
     void Start()
     {
@@ -23,7 +24,7 @@ public class BoxMovement : MonoBehaviour
             screenBottom - 1f,    // Below the bottom of the screen
             0
         );
-
+        boxSpawner = GetComponent<BoxSpawner>();
         boxCollisions = GetComponent<BoxCollisions>();
         Debug.Log("Box spawned at position: " + transform.position);
     }
@@ -55,6 +56,9 @@ public class BoxMovement : MonoBehaviour
             if (transform.position.y <= screenBottom)
             {
                 boxCollisions.handleCollisionOutsideScreen();
+
+                boxSpawner.BoxDestroyed();
+
             }
 
         }
