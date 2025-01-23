@@ -8,68 +8,60 @@ public class BoxSpawner : MonoBehaviour
     public float xMax = 6f;  // Maximum x-coordinate for spawning
     public float spawnHeight = 10f; // Height where boxes will spawn from
     public int maxBoxesPerSpawn = 2; // Maximum number of boxes to spawn at once
-
-    // Reference to PlayerLauncher script
-    private PlayerLauncher playerLauncher;  // Reference to PlayerLauncher to get screen edges
-
+    private PlayerBorder playerBorder;  // Reference to PlayerBorder to get screen edges
     public static float timer;
-    private int activeBoxCount = 0; // Number of boxes currently on screen
+    public int activeBoxCount = 0; 
     void Start()
     {
-        // Automatically find PlayerLauncher component in the scene
-        playerLauncher = FindObjectOfType<PlayerLauncher>();
-
+        playerBorder = FindObjectOfType<PlayerBorder>();
     }
-
     void Update()
     {
         timer += Time.deltaTime;
+        IsAnyBoxOnScreen();
 
-        Debug.Log("Timer: " + timer);
+        GameObject[] allBoxes = GameObject.FindGameObjectsWithTag("boxPrefab");
+        activeBoxCount = allBoxes.Length;
+        Debug.Log("Active box count: " + activeBoxCount);
+        // Debug.Log("Timer: " + timer);
 
         // Check if any boxPrefab is on screen and only spawn if none are present
         if (timer >= spawnInterval && !IsAnyBoxOnScreen())
         {
-            Debug.Log("Spawning new boxes");
-            SpawnBoxes();
+            Debug.Log("Spawning new boxes" + activeBoxCount);
+            // SpawnBoxes();
             timer = 0f;  // Reset timer after spawning
         }
-
+        else
+        {
+            Debug.Log("Boxes are still on screen" + activeBoxCount);
+        }
     }
 
-    // Function to check if any boxPrefab is currently within the screen boundaries
     private bool IsAnyBoxOnScreen()
     {
         // Get all boxes in the scene
         GameObject[] allBoxes = GameObject.FindGameObjectsWithTag("boxPrefab");
-
         // Loop through all the boxes and check if any are within screen boundaries
         foreach (GameObject boxPrefab in allBoxes)
         {
-            BoxMovement boxMovement = boxPrefab.GetComponent<BoxMovement>();
-
-            if (boxMovement != null && boxMovement.isActive)
+            BoxCollisions boxCollisions = boxPrefab.GetComponent<BoxCollisions>();
+            if (boxCollisions != null && boxCollisions.isActive)
             {
                 // Get the boxPrefab's position
                 float boxYPosition = boxPrefab.transform.position.y;
-
                 // Check if the boxPrefab is between the top and bottom edges of the screen
-                if (boxYPosition <= playerLauncher.topEdge && boxYPosition >= playerLauncher.bottomEdge)
+                if (boxYPosition <= playerBorder.topEdge && boxYPosition >= playerBorder.bottomEdge)
                 {
-                    Debug.Log("boxPrefab is on screen: " + boxPrefab.name);
                     return true;
                 }
             }
         }
-
         return false; // No boxPrefab on screen
     }
 
-
-
     public void SpawnBoxes()
     {
-
         if (boxPrefab == null)
         {
             Debug.LogError("BoxPrefab is not assigned!");
@@ -80,18 +72,14 @@ public class BoxSpawner : MonoBehaviour
         {
             // Clamp the number of boxes to ensure it doesn't exceed the maximum
             int boxesToSpawn = Mathf.Clamp(Random.Range(1, maxBoxesPerSpawn + 1), 1, maxBoxesPerSpawn);
-
             for (int i = 0; i < boxesToSpawn; i++)
             {
                 // Generate a random x-position within the defined range
                 float spawnX = Random.Range(xMin, xMax);
-
                 // Instantiate the new boxPrefab at the random position
                 GameObject newBox = Instantiate(boxPrefab, new Vector2(spawnX, spawnHeight), Quaternion.identity);
-
-
                 // Randomly select a box type
-                BoxType type = (BoxType)Random.Range(0, System.Enum.GetValues(typeof(BoxType)).Length);
+                BoxType type = (BoxType)Random.Range(0, System.Enum.GetValues(typeof(BoxType)).Length); 
 
                 SpriteRenderer spriteRenderer = newBox.GetComponent<SpriteRenderer>();
                 switch (type)
@@ -107,44 +95,37 @@ public class BoxSpawner : MonoBehaviour
                         break;
                 }
 
-
-                BoxMovement boxMovement = newBox.GetComponent<BoxMovement>();
-                if (boxMovement != null)
+                BoxCollisions boxCollisions = newBox.GetComponent<BoxCollisions>();
+                if (boxCollisions != null)
                 {
-                    boxMovement.SetBoxType(type); // Set the box type
-                    boxMovement.SetBoxSpawnerReference(this); // Pass reference to BoxSpawner
+                    boxCollisions.SetBoxType(type); // Set the box type
+                    boxCollisions.SetBoxSpawnerReference(this); // Pass reference to BoxSpawner
                 }
 
+                EnableBoxComponents(newBox);  // Ensure components are properly enabled
 
-                activeBoxCount++; // Increment the active box count
-
-                // Ensure components are properly enabled
-                EnableBoxComponents(newBox);
-
-                // Log spawn for debugging
-                Debug.Log("New box spawned at position: " + new Vector2(spawnX, spawnHeight));
+                Debug.Log("New box spawned at position: " + new Vector2(spawnX, spawnHeight)); // Log spawn for debugging
             }
         }
-
-
     }
 
     public void BoxDestroyed()
     {
-        activeBoxCount--; // Decrement active box count
-        if (activeBoxCount < 0)
+        if (gameObject != null)
         {
-            activeBoxCount = 0; // Safety check
+            Destroy(gameObject); // Destroy the boxPrefab
+            activeBoxCount--; // Decrement the active box count
+        } else {
+            Debug.LogError("BoxPrefab is null!" + gameObject);
         }
+        Debug.Log("Box count is now: " + activeBoxCount);
 
-        // Check if there are no active boxes, and spawn a new one
-        if (activeBoxCount == 0)
+        if (!IsAnyBoxOnScreen() && activeBoxCount == 0)   
         {
             Debug.Log("No active boxes, spawning a new box...");
             SpawnBoxes(); // Call SpawnBoxes to spawn new box if no active boxes
         }
     }
-
 
     private void EnableBoxComponents(GameObject boxPrefab)
     {
@@ -161,11 +142,10 @@ public class BoxSpawner : MonoBehaviour
             rb2d.simulated = true; // Enable Rigidbody2D physics if it's not kinematic
         }
 
-        // Ensure the BoxCollider2D is enabled
         BoxCollider2D boxCollider = boxPrefab.GetComponent<BoxCollider2D>();
         if (boxCollider != null)
         {
-            boxCollider.enabled = true;  // Enable BoxCollider2D
+            boxCollider.enabled = true;  
         }
     }
 }

@@ -5,62 +5,46 @@ using TMPro;
 public class TitleScreenManager : MonoBehaviour
 {
     public GameObject TitleCanvas;  // Reference to the title canvas
-
     public GameObject TitleButton;  // Reference to the title button
     public Button playButton;       // Reference to the play button
-
     public GameObject TitlePanel;   // Reference to the title panel
-
     public GameObject ScoreText;    // Reference to the score text
-
     public GameObject LivesText;    // Reference to the lives text
-
+    public GameObject boxPrefab;     // Reference to the box prefab
+    // public GameObject PowerBar;     // Reference to the power bar
     public GameObject BestScoreText;
-
+    // public GameObject HUDObject;
+    // public Button HUDButton; // Reference to the HUD button
     public static int bestScore = 10;
-
-
-
-    // public GameObject PlayerSphere; 
+    public BoxSpawner boxSpawner; 
 
     private void Start()
     {
-        // Ensure the title canvas is active at the start of the game
-        TitleCanvas.SetActive(true);
+        Debug.Log("TitleScreenManager started.");
+        TitleCanvas.SetActive(true); // Ensure the title canvas is active at the start of the game
         TitlePanel.SetActive(true);
-        ScoreText.SetActive(false);
-        LivesText.SetActive(false);
-        // PlayerSphere.SetActive(false);
 
+        // PowerBar.SetActive(false);
+
+        boxSpawner = FindObjectOfType<BoxSpawner>();
         Time.timeScale = 0f; // Pause the game
-
-        // Set up the button click listener
-        playButton.onClick.AddListener(StartGame);
-
+        playButton.onClick.AddListener(StartGame);  // HUDButton.onClick.AddListener(ResetGame);
         bestScore = PlayerPrefs.GetInt("BestScore", 0);
         Debug.Log($"Best score loaded: {bestScore}");
-        // Update the best score text at the start
-        UpdateBestScoreText();
+        UpdateBestScoreText(); // Update the best score text at the start
     }
 
     public void ShowTitleScreen()
     {
-        // Display the title screen
-        TitleCanvas.SetActive(true);
-
-        // Pause the game while on the title screen (if you want)
-        Time.timeScale = 0f;
-
-        // Update the best score text
-        UpdateBestScoreText();
-
+        TitleCanvas.SetActive(true); // Display the title screen
+        Time.timeScale = 0f;  // Pause the game while on the title screen (if you want)
+        UpdateBestScoreText(); // Update the best score text
     }
 
     private void UpdateBestScoreText()
     {
         if (BestScoreText != null)
         {
-            // Get the TMP_Text component from the GameObject
             TMP_Text bestScoreTextComponent = BestScoreText.GetComponent<TMP_Text>();
             if (bestScoreTextComponent != null)
             {
@@ -77,21 +61,24 @@ public class TitleScreenManager : MonoBehaviour
             Debug.LogWarning("BestScoreText reference is null.");
         }
     }
-    // Method to start the game
 
     public void StartGame()
     {
-        // Hide the title screen and unpause the game
-        TitleCanvas.SetActive(false);
+        TitleCanvas.SetActive(true);  // Hide the title screen and unpause the game
         TitleButton.SetActive(false);
         TitlePanel.SetActive(false);
+        // PowerBar.SetActive(false);
 
         ScoreText.SetActive(true);
         LivesText.SetActive(true);
-        // PlayerSphere.SetActive(true);
         Time.timeScale = 1f;
+        boxSpawner.SpawnBoxes();
+    }
 
-
-
+    public void ResetGame()
+    {
+        PlayerCollisions.score = 0;
+        PlayerCollisions.lives = 3;
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name); // Reload the current scene
     }
 }

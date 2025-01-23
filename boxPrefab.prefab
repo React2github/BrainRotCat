@@ -12,8 +12,10 @@ GameObject:
   - component: {fileID: 2028587373240943508}
   - component: {fileID: 3558149210587280130}
   - component: {fileID: 4810258391992986913}
-  - component: {fileID: 5443212865382623901}
   - component: {fileID: -8574334374898895615}
+  - component: {fileID: 3970828723308548541}
+  - component: {fileID: 3611768570889681425}
+  - component: {fileID: 8881877915813527270}
   m_Layer: 0
   m_Name: boxPrefab
   m_TagString: boxPrefab
@@ -146,31 +148,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 6402386255546425535}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 60793d223c5233b4cac3aedad72aa1f6, type: 3}
+  m_Script: {fileID: 11500000, guid: f019f19ee5922104b96934696e9f849d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  floatSpeed: 3
-  maxFallSpeed: 2
-  acceleration: 2
-  isActive: 1
---- !u!114 &5443212865382623901
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6402386255546425535}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 44ab508ec8b507b4c866f33687cf6089, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  boxPrefab: {fileID: 6402386255546425535}
-  spawnInterval: 8.5
-  xMin: -1
-  xMax: 6
-  spawnHeight: 10
-  maxBoxesPerSpawn: 2
+  floatSpeed: 6
+  maxFallSpeed: 5
+  acceleration: 5
 --- !u!50 &-8574334374898895615
 Rigidbody2D:
   serializedVersion: 5
@@ -179,7 +162,7 @@ Rigidbody2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6402386255546425535}
-  m_BodyType: 1
+  m_BodyType: 0
   m_Simulated: 1
   m_UseFullKinematicContacts: 1
   m_UseAutoMass: 0
@@ -198,3 +181,51 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 1
   m_Constraints: 0
+--- !u!114 &3970828723308548541
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6402386255546425535}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f23f2e8d6d4311644b3e90304038299c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isActive: 1
+--- !u!114 &3611768570889681425
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6402386255546425535}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a05a4eaf81083df4f83e69ada8954db1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GameOverPanel: {fileID: 0}
+  GameOverText: {fileID: 0}
+  ResetButton: {fileID: 0}
+  ReplayButton: {fileID: 0}
+--- !u!114 &8881877915813527270
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6402386255546425535}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 930bbdc9e5212a948ae54643062d7f00, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  boxPrefab: {fileID: 6402386255546425535}
+  spawnInterval: 8.5
+  xMin: -1
+  xMax: 6
+  spawnHeight: 10
+  maxBoxesPerSpawn: 2
+  activeBoxCount: 0
