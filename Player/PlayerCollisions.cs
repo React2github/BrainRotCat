@@ -3,14 +3,17 @@ using TMPro;
 public enum BoxType
 {
     AddPoints,
+    AddMoney,
     MultiplyPoints,
-    RemoveLife
+    RemoveLife,
+    AddPowerup
 }
 public class PlayerCollisions : MonoBehaviour
 {
     public BoxType boxType;
     public static int score = 0; // Variable to keep track of the score
     public static int lives = 3; // Variable to keep track of the lives
+    public static int coin = 0; // Variable to keep track of the coins
     public TextMeshProUGUI scoreText; // Reference to the UI Text element
     public TextMeshProUGUI livesText; // Reference to the UI Text element
     private GameManager gameManager;
@@ -28,11 +31,17 @@ public class PlayerCollisions : MonoBehaviour
             case BoxType.AddPoints:
                 score += 10;
                 break;
+            case BoxType.AddMoney:
+                coin += 10;
+                break;
             case BoxType.MultiplyPoints:
                 score += 100;
                 break;
             case BoxType.RemoveLife:
                 lives -= 1;
+                break;
+            case BoxType.AddPowerup:
+                coin += 20;
                 break;
         }
         UpdateScoreText();

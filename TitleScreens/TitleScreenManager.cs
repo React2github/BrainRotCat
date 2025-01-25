@@ -10,6 +10,7 @@ public class TitleScreenManager : MonoBehaviour
     public GameObject TitlePanel;   // Reference to the title panel
     public GameObject ScoreText;    // Reference to the score text
     public GameObject LivesText;    // Reference to the lives text
+    public GameObject CoinText;     // Reference to the coin text
     public GameObject boxPrefab;     // Reference to the box prefab
     // public GameObject PowerBar;     // Reference to the power bar
     public GameObject BestScoreText;
@@ -71,6 +72,7 @@ public class TitleScreenManager : MonoBehaviour
 
         ScoreText.SetActive(true);
         LivesText.SetActive(true);
+        CoinText.SetActive(true);
         Time.timeScale = 1f;
         boxSpawner.SpawnBoxes();
     }

@@ -2,9 +2,9 @@ using UnityEngine;
 
 public class BoxMovement : MonoBehaviour
 {
-    public float floatSpeed = 6f; // Speed for floating up
+    public float floatSpeed; // Speed for floating up
     public float maxFallSpeed = 5f; // Maximum speed while falling
-    public float acceleration = 5f; // Acceleration as the box gets close to the bottom
+    public float acceleration; // Acceleration as the box gets close to the bottom
     private bool movingUp = true; // Is the box floating up?
     private float screenBottom;
     private float screenTop;
@@ -62,5 +62,13 @@ public class BoxMovement : MonoBehaviour
             }
 
         }
+    }
+
+        public void Initialize(float floatSpeed, float acceleration, BoxSpawner spawner)
+    {
+        this.floatSpeed = floatSpeed;
+        this.acceleration = acceleration;
+
+        this.boxSpawner = spawner;
     }
 }

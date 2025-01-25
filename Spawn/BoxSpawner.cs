@@ -24,22 +24,7 @@ public class BoxSpawner : MonoBehaviour
         GameObject[] allBoxes = GameObject.FindGameObjectsWithTag("boxPrefab");
         Debug.Log("Active box count: " + allBoxes.Length);
 
-
-        // Debug.Log("Timer: " + timer);
-
-        // Check if any boxPrefab is on screen and only spawn if none are present
-        if (timer >= spawnInterval && !IsAnyBoxOnScreen())
-        {
-            Debug.Log("Spawning new boxes");
-            // SpawnBoxes();
-            timer = 0f;  // Reset timer after spawning
-        }
-        else
-        {
-            Debug.Log("Boxes are still on screen");
-        }
     }
-
     private bool IsAnyBoxOnScreen()
     {
         // Get all boxes in the scene
@@ -72,7 +57,7 @@ public class BoxSpawner : MonoBehaviour
 
         if (!IsAnyBoxOnScreen())
         {
-            // Clamp the number of boxes to ensure it doesn't exceed the maximum
+            // Clamp the number of boxes to ensure it doesn't exceed the maximum green: money, yellw
             int boxesToSpawn = Mathf.Clamp(Random.Range(1, maxBoxesPerSpawn + 1), 1, maxBoxesPerSpawn);
             for (int i = 0; i < boxesToSpawn; i++)
             {
@@ -80,21 +65,39 @@ public class BoxSpawner : MonoBehaviour
                 float spawnX = Random.Range(xMin, xMax);
                 // Instantiate the new boxPrefab at the random position
                 GameObject newBox = Instantiate(boxPrefab, new Vector2(spawnX, spawnHeight), Quaternion.identity);
+
+                // Assign random floatSpeed and acceleration values
+                float randomFloatSpeed = Random.Range(2f, 5f); // Adjust range as needed
+                float randomAcceleration = Random.Range(2f, 5f); // Adjust range as needed
+
+                BoxMovement boxMovement = newBox.GetComponent<BoxMovement>();
+                if (boxMovement != null)
+                {
+                    boxMovement.Initialize(randomFloatSpeed, randomAcceleration, this);
+                }
+
                 // Randomly select a box type
                 newBox.tag = "boxPrefab"; // Add tag to the new boxPrefab
                 BoxType type = (BoxType)Random.Range(0, System.Enum.GetValues(typeof(BoxType)).Length);
+
 
                 SpriteRenderer spriteRenderer = newBox.GetComponent<SpriteRenderer>();
                 switch (type)
                 {
                     case BoxType.AddPoints:
-                        spriteRenderer.color = Color.green; // Green for adding points
+                        spriteRenderer.color = Color.white; // White for adding points
+                        break;
+                    case BoxType.AddMoney:
+                        spriteRenderer.color = Color.yellow; // Yellow for adding money
                         break;
                     case BoxType.MultiplyPoints:
-                        spriteRenderer.color = Color.yellow;   // Red for deducting points
+                        spriteRenderer.color = Color.green;  // Green for multiplying points
                         break;
                     case BoxType.RemoveLife:
-                        spriteRenderer.color = Color.black; // Yellow for removing life
+                        spriteRenderer.color = Color.black; // Black for removing life
+                        break;
+                    case BoxType.AddPowerup:
+                        spriteRenderer.color = Color.blue; // Purple for adding powerup
                         break;
                 }
 
@@ -118,16 +121,10 @@ public class BoxSpawner : MonoBehaviour
         {
             gameObject.tag = "Untagged"; // Remove from "boxPrefab" tag to exclude from future searches
             Destroy(gameObject); // Destroy the boxPrefab
-            Debug.Log("Box destroyed.");
-        }
-        else
-        {
-            Debug.LogError("BoxPrefab is null!");
         }
 
         // Dynamically count active boxes
         int boxCount = GameObject.FindGameObjectsWithTag("boxPrefab").Length;
-        Debug.Log("Updated active box count: " + boxCount);
 
         if (boxCount == 0)
         {
