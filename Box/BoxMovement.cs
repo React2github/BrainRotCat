@@ -8,6 +8,7 @@ public class BoxMovement : MonoBehaviour
     private bool movingUp = true; // Is the box floating up?
     private float screenBottom;
     private float screenTop;
+    private float maxHeight; // Maximum height the box can reach
     private BoxCollisions boxCollisions;
     private BoxSpawner boxSpawner;
 
@@ -17,6 +18,7 @@ public class BoxMovement : MonoBehaviour
         Camera cam = Camera.main;
         screenBottom = cam.ViewportToWorldPoint(new Vector3(0, 0, 0)).y;
         screenTop = cam.ViewportToWorldPoint(new Vector3(0, 1, 0)).y;
+        maxHeight = screenTop - 1f;
 
         // Start the box below the screen
         transform.position = new Vector3(
@@ -36,7 +38,7 @@ public class BoxMovement : MonoBehaviour
             // Move up
             transform.position += Vector3.up * floatSpeed * Time.deltaTime;
             // Check if the box has reached the top
-            if (transform.position.y >= screenTop)
+            if (transform.position.y >= maxHeight)
             {
                 movingUp = false; // Start falling
             }
@@ -45,7 +47,7 @@ public class BoxMovement : MonoBehaviour
         {
             // Accelerate as the box falls down
             float fallSpeed = Mathf.Clamp(
-                maxFallSpeed * ((transform.position.y - screenBottom) / (screenTop - screenBottom)),
+                maxFallSpeed * ((transform.position.y - screenBottom) / (maxHeight - screenBottom)),
                 0,
                 maxFallSpeed
             );
@@ -64,7 +66,7 @@ public class BoxMovement : MonoBehaviour
         }
     }
 
-        public void Initialize(float floatSpeed, float acceleration, BoxSpawner spawner)
+    public void Initialize(float floatSpeed, float acceleration, BoxSpawner spawner)
     {
         this.floatSpeed = floatSpeed;
         this.acceleration = acceleration;

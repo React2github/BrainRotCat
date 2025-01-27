@@ -49,7 +49,7 @@ public class PlayerCollisions : MonoBehaviour
         if (lives <= 0)
         {
             lives = 0;
-            // gameManager.GameOver();
+            gameManager.GameOver();
         }
     }
 

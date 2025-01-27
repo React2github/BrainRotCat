@@ -1,15 +1,17 @@
 
 using UnityEngine;
+
 public class BoxSpawner : MonoBehaviour
 {
     public GameObject boxPrefab;  // Reference to the boxPrefab prefab
     public float spawnInterval = 8.5f;  // Time between spawns
-    public float xMin = -1f;  // Minimum x-coordinate for spawning
+    public float xMin = 2f;  // Minimum x-coordinate for spawning
     public float xMax = 6f;  // Maximum x-coordinate for spawning
     public float spawnHeight = 10f; // Height where boxes will spawn from
     public int maxBoxesPerSpawn = 2; // Maximum number of boxes to spawn at once
     private PlayerBorder playerBorder;  // Reference to PlayerBorder to get screen edges
     public static float timer;
+    public Material[] customBoxMaterials;
 
     void Start()
     {
@@ -67,8 +69,8 @@ public class BoxSpawner : MonoBehaviour
                 GameObject newBox = Instantiate(boxPrefab, new Vector2(spawnX, spawnHeight), Quaternion.identity);
 
                 // Assign random floatSpeed and acceleration values
-                float randomFloatSpeed = Random.Range(2f, 5f); // Adjust range as needed
-                float randomAcceleration = Random.Range(2f, 5f); // Adjust range as needed
+                float randomFloatSpeed = Random.Range(2f, 3f); // Adjust range as needed
+                float randomAcceleration = Random.Range(2f, 3f); // Adjust range as needed
 
                 BoxMovement boxMovement = newBox.GetComponent<BoxMovement>();
                 if (boxMovement != null)
@@ -81,25 +83,13 @@ public class BoxSpawner : MonoBehaviour
                 BoxType type = (BoxType)Random.Range(0, System.Enum.GetValues(typeof(BoxType)).Length);
 
 
-                SpriteRenderer spriteRenderer = newBox.GetComponent<SpriteRenderer>();
-                switch (type)
-                {
-                    case BoxType.AddPoints:
-                        spriteRenderer.color = Color.white; // White for adding points
-                        break;
-                    case BoxType.AddMoney:
-                        spriteRenderer.color = Color.yellow; // Yellow for adding money
-                        break;
-                    case BoxType.MultiplyPoints:
-                        spriteRenderer.color = Color.green;  // Green for multiplying points
-                        break;
-                    case BoxType.RemoveLife:
-                        spriteRenderer.color = Color.black; // Black for removing life
-                        break;
-                    case BoxType.AddPowerup:
-                        spriteRenderer.color = Color.blue; // Purple for adding powerup
-                        break;
-                }
+                MeshRenderer meshRenderer = newBox.GetComponent<MeshRenderer>();
+                // Dynamically determine and assign the material based on BoxType
+                Material newMaterial = GetMaterialForBoxType(type);
+
+                // Apply the material
+                Debug.Log("Material works" + newMaterial.mainTexture);
+                meshRenderer.material = newMaterial;
 
                 BoxCollisions boxCollisions = newBox.GetComponent<BoxCollisions>();
                 if (boxCollisions != null)
@@ -113,6 +103,35 @@ public class BoxSpawner : MonoBehaviour
                 Debug.Log("New box spawned at position: " + new Vector2(spawnX, spawnHeight)); // Log spawn for debugging
             }
         }
+    }
+
+    Material GetMaterialForBoxType(BoxType type)
+    {
+         Material loadedMaterial = null;
+
+        switch (type)
+        {
+            case BoxType.AddPoints:
+                loadedMaterial = Resources.Load<Material>("AddPointsTexture"); // Load the material
+                break;
+            case BoxType.AddMoney:
+                loadedMaterial = Resources.Load<Material>("AddMoneyTexture");
+                break;
+
+            case BoxType.MultiplyPoints:
+                loadedMaterial = Resources.Load<Material>("MultiplyPointsTexture");
+                break;
+
+            case BoxType.RemoveLife:
+                loadedMaterial = Resources.Load<Material>("RemoveLifeTexture");
+                break;
+
+            case BoxType.AddPowerup:
+                loadedMaterial = Resources.Load<Material>("AddPowerupTexture");
+                break;
+        }
+
+        return loadedMaterial;
     }
 
     public void BoxDestroyed()

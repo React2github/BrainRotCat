@@ -42,11 +42,15 @@ public class BoxCollisions : MonoBehaviour
     public void handleCollisionOutsideScreen()
     {
         {
-            if (boxType == BoxType.AddPoints || boxType == BoxType.MultiplyPoints)
+            if (boxType == BoxType.RemoveLife)
+            {
+                return;
+            }
+            else
             {
                 if (PlayerCollisions.lives > 0)
                     PlayerCollisions.lives--;
-                    playerCollisions.UpdateLivesUI();
+                playerCollisions.UpdateLivesUI();
             }
 
             if (boxSpawner != null)
@@ -57,7 +61,7 @@ public class BoxCollisions : MonoBehaviour
             if (PlayerCollisions.lives <= 0)
             {
                 PlayerCollisions.lives = 0;
-                // gameManager.GameOver();
+                gameManager.GameOver();
             }
 
         }
