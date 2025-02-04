@@ -32,7 +32,7 @@ public class PlayerCollisions : MonoBehaviour
                 score += 10;
                 break;
             case BoxType.AddMoney:
-                coin += 10;
+                score += 150;
                 break;
             case BoxType.MultiplyPoints:
                 score += 100;
@@ -41,7 +41,7 @@ public class PlayerCollisions : MonoBehaviour
                 lives -= 1;
                 break;
             case BoxType.AddPowerup:
-                coin += 20;
+                lives += 1;
                 break;
         }
         UpdateScoreText();

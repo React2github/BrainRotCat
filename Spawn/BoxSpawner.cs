@@ -1,6 +1,7 @@
 
 using UnityEngine;
-
+using TMPro;
+using System.Collections;
 public class BoxSpawner : MonoBehaviour
 {
     public GameObject boxPrefab;  // Reference to the boxPrefab prefab
@@ -81,15 +82,15 @@ public class BoxSpawner : MonoBehaviour
                 // Randomly select a box type
                 newBox.tag = "boxPrefab"; // Add tag to the new boxPrefab
                 BoxType type = (BoxType)Random.Range(0, System.Enum.GetValues(typeof(BoxType)).Length);
+                SetCapsuleColor(type, newBox);
 
 
                 MeshRenderer meshRenderer = newBox.GetComponent<MeshRenderer>();
                 // Dynamically determine and assign the material based on BoxType
-                Material newMaterial = GetMaterialForBoxType(type);
+                // Material newMaterial = GetMaterialForBoxType(type);
 
                 // Apply the material
-                Debug.Log("Material works" + newMaterial.mainTexture);
-                meshRenderer.material = newMaterial;
+                // meshRenderer.material = newMaterial;
 
                 BoxCollisions boxCollisions = newBox.GetComponent<BoxCollisions>();
                 if (boxCollisions != null)
@@ -105,33 +106,91 @@ public class BoxSpawner : MonoBehaviour
         }
     }
 
-    Material GetMaterialForBoxType(BoxType type)
+    void SetCapsuleColor(BoxType type, GameObject boxPrefab)
     {
-         Material loadedMaterial = null;
+        // Find the child object named "Capsule" inside boxPrefab
+        Transform capsuleTransform = boxPrefab.transform.Find("Capsule");
 
-        switch (type)
+        if (capsuleTransform != null)
         {
-            case BoxType.AddPoints:
-                loadedMaterial = Resources.Load<Material>("AddPointsTexture"); // Load the material
-                break;
-            case BoxType.AddMoney:
-                loadedMaterial = Resources.Load<Material>("AddMoneyTexture");
-                break;
+            Renderer capsuleRenderer = capsuleTransform.GetComponent<Renderer>();
+            Transform labelTextTransform = boxPrefab.transform.Find("LabelText");
 
-            case BoxType.MultiplyPoints:
-                loadedMaterial = Resources.Load<Material>("MultiplyPointsTexture");
-                break;
+            if (capsuleRenderer != null)
+            {
+                capsuleRenderer.material = new Material(capsuleRenderer.material); // Create a new material instance
+                Color baseColor = Color.white;
 
-            case BoxType.RemoveLife:
-                loadedMaterial = Resources.Load<Material>("RemoveLifeTexture");
-                break;
+                // Set the material color dynamically based on the BoxType
+                switch (type)
+                {
+                    case BoxType.AddPoints:
+                        baseColor = Color.white;
+                        SetLabelText(labelTextTransform, "");
+                        break;
+                    case BoxType.AddMoney:
+                        baseColor = Color.yellow;
+                        SetLabelText(labelTextTransform, "150");
+                        break;
+                    case BoxType.MultiplyPoints:
+                        baseColor = Color.green;
+                        SetLabelText(labelTextTransform, "100");
+                        break;
+                    case BoxType.RemoveLife:
+                        baseColor = Color.black;
+                        SetLabelText(labelTextTransform, "");
+                        break;
+                    case BoxType.AddPowerup:
+                        SetLabelText(labelTextTransform, "");
+                        baseColor = Color.red;
+                        break;
+                }
 
-            case BoxType.AddPowerup:
-                loadedMaterial = Resources.Load<Material>("AddPowerupTexture");
-                break;
+                capsuleRenderer.material.color = baseColor;  // Set the base color
+
+                MonoBehaviour boxMonoBehaviour = boxPrefab.GetComponent<MonoBehaviour>();
+                if (boxMonoBehaviour != null)
+                {
+                    boxMonoBehaviour.StartCoroutine(ColorPopEffect(capsuleRenderer, baseColor));
+                }
+            }
+        }
+    }
+
+    IEnumerator ColorPopEffect(Renderer renderer, Color baseColor)
+    {
+        float duration = 8f;
+        float elapsedTime = 0f;
+
+        Color popColor = Color.Lerp(baseColor, Color.white, 0.5f); // Brighter pop color
+
+        while (elapsedTime < duration)
+        {
+            float t = Mathf.PingPong(Time.time * 2f, 1f);
+            Color poppedColor = Color.Lerp(baseColor, popColor, t);
+
+            renderer.material.SetColor("_Color", poppedColor); // Ensure proper material update
+            Debug.Log(renderer.material.color + "popped color" + poppedColor);
+
+            elapsedTime += Time.deltaTime;
+            yield return null;
         }
 
-        return loadedMaterial;
+        renderer.material.SetColor("_Color", baseColor); // Reset at the end
+        Debug.Log(renderer.material.color + "reset to base color" + baseColor);
+    }
+
+
+    // Method to set the label text of the TMP text object
+    void SetLabelText(Transform labelTextTransform, string labelText)
+    {
+        // Get the TextMeshPro component from the label text object
+        TextMeshPro textMeshPro = labelTextTransform.GetComponent<TextMeshPro>();
+
+        if (textMeshPro != null)
+        {
+            textMeshPro.text = labelText;  // Set the text dynamically
+        }
     }
 
     public void BoxDestroyed()

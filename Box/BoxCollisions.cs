@@ -1,5 +1,5 @@
 using UnityEngine;
-
+using System.Collections;
 public class BoxCollisions : MonoBehaviour
 {
     private BoxType boxType;
@@ -7,6 +7,8 @@ public class BoxCollisions : MonoBehaviour
     private BoxSpawner boxSpawner;
     private GameManager gameManager;
     public bool isActive = true;
+    private AudioSource audioSource;
+    // public GameObject expulsionEffectPrefab; 
     public void SetBoxSpawnerReference(BoxSpawner spawner)
     {
         boxSpawner = spawner;
@@ -20,6 +22,8 @@ public class BoxCollisions : MonoBehaviour
         gameManager = FindObjectOfType<GameManager>();
         playerCollisions = FindObjectOfType<PlayerCollisions>();
         boxSpawner = FindObjectOfType<BoxSpawner>();
+        audioSource = GetComponent<AudioSource>();
+        audioSource.enabled = true;
         if (boxSpawner == null)
         {
             Debug.LogError("BoxSpawner component not found in the scene!");
@@ -31,11 +35,33 @@ public class BoxCollisions : MonoBehaviour
         if (collision.gameObject.CompareTag("PlayerSphere"))
         {
             isActive = false;
+            Vector2 contactPoint = collision.contacts[0].point;
+
             playerCollisions.OnBoxCollision(boxType); // Call method to update score/lives
             if (boxSpawner != null)
             {
-                boxSpawner.BoxDestroyed();
+                audioSource.Play();
+                StartCoroutine(DelayedBoxDestruction(contactPoint));
             }
+        }
+    }
+
+    private IEnumerator DelayedBoxDestruction(Vector2 contactPoint)
+    {
+        // Wait for the duration of the audio clip
+        yield return new WaitForSeconds(audioSource.clip.length);
+
+        // if (expulsionEffectPrefab != null)
+        // {
+        //     Instantiate(expulsionEffectPrefab, contactPoint, Quaternion.identity);
+        // }
+
+        // ParticleSystem particleSystem = expulsionEffectPrefab.GetComponent<ParticleSystem>();
+        // particleSystem.Play();
+        // Destroy the box after the audio has finished playing
+        if (boxSpawner != null)
+        {
+            boxSpawner.BoxDestroyed();
         }
     }
 

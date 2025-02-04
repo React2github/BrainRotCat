@@ -72,7 +72,7 @@ public class TitleScreenManager : MonoBehaviour
 
         ScoreText.SetActive(true);
         LivesText.SetActive(true);
-        CoinText.SetActive(true);
+        // CoinText.SetActive(true);
         Time.timeScale = 1f;
         boxSpawner.SpawnBoxes();
     }

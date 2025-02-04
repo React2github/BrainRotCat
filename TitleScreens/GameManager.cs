@@ -26,6 +26,7 @@ public class GameManager : MonoBehaviour
 
             UpdateBestScoreText(); // Update the best score text
             PlayerCollisions.lives = 3; // Reset lives
+            PlayerCollisions.score = 0; // Reset score
             // SceneManager.LoadScene(SceneManager.GetActiveScene().name); 
         }
     }
@@ -48,6 +49,7 @@ public class GameManager : MonoBehaviour
         GameOverText.SetActive(false); // Hide the GameOver text
         ResetButton.SetActive(false); // Hide the reset button
         ReplayButton.SetActive(false); // Hide the replay button
+
 
         Time.timeScale = 1f; // Resume the game
         PlayerCollisions.lives = 3; // Reset lives

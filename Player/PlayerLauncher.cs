@@ -18,6 +18,7 @@ public class PlayerLauncher : MonoBehaviour
 
     private void Start()
     {
+        Debug.Log("PlayerLauncher script is attached to: " + gameObject.name);
         rb = GetComponent<Rigidbody2D>(); // Get the Rigidbody2D
 
         if (lineRenderer == null)
@@ -42,7 +43,7 @@ public class PlayerLauncher : MonoBehaviour
             powerBar.gameObject.SetActive(false); // Hide the progress bar initially
         }
 
-        Invoke("GameOver", 3f); // Simulate game over after 3 seconds
+        // Invoke("GameOver", 3f); 
         Debug.Log("SpriteRenderer: " + spriteRenderer);
     }
     void OnMouseDown()
@@ -54,6 +55,7 @@ public class PlayerLauncher : MonoBehaviour
         }
 
         initialMousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        Debug.Log("Initial Mouse Position: " + initialMousePosition);
         // Initialize the LineRenderer with 2 points (start and end)
         lineRenderer.positionCount = 0;
         // lineRenderer.SetPosition(0, transform.position); 
