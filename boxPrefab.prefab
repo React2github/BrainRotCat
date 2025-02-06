@@ -13,8 +13,6 @@ GameObject:
   - component: {fileID: 4810258391992986913}
   - component: {fileID: -8574334374898895615}
   - component: {fileID: 3970828723308548541}
-  - component: {fileID: 3611768570889681425}
-  - component: {fileID: 8881877915813527270}
   m_Layer: 0
   m_Name: boxPrefab
   m_TagString: boxPrefab
@@ -138,39 +136,3 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isActive: 1
---- !u!114 &3611768570889681425
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6402386255546425535}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a05a4eaf81083df4f83e69ada8954db1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  GameOverPanel: {fileID: 0}
-  GameOverText: {fileID: 0}
-  ResetButton: {fileID: 0}
-  ReplayButton: {fileID: 0}
-  GameOverCanvas: {fileID: 0}
---- !u!114 &8881877915813527270
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6402386255546425535}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 930bbdc9e5212a948ae54643062d7f00, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  boxPrefab: {fileID: 6402386255546425535}
-  spawnInterval: 8.5
-  xMin: -1
-  xMax: 6
-  spawnHeight: 10
-  maxBoxesPerSpawn: 2
-  customBoxMaterials: []

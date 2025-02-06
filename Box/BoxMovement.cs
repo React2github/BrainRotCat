@@ -57,9 +57,10 @@ public class BoxMovement : MonoBehaviour
             // Destroy the box if it goes off the screen
             if (transform.position.y <= screenBottom)
             {
+                Debug.Log("Start of GameOver");
                 boxCollisions.handleCollisionOutsideScreen();
 
-                boxSpawner.BoxDestroyed();
+                BoxSpawner.Instance.BoxDestroyed(gameObject);
 
             }
 

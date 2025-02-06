@@ -41,7 +41,7 @@ public class PlayerCollisions : MonoBehaviour
                 lives -= 1;
                 break;
             case BoxType.AddPowerup:
-                lives += 1;
+                score += 15;
                 break;
         }
         UpdateScoreText();

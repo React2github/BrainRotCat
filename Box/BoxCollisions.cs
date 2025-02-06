@@ -7,7 +7,7 @@ public class BoxCollisions : MonoBehaviour
     private BoxSpawner boxSpawner;
     private GameManager gameManager;
     public bool isActive = true;
-    private AudioSource audioSource;
+    // private AudioSource audioSource;
     // public GameObject expulsionEffectPrefab; 
     public void SetBoxSpawnerReference(BoxSpawner spawner)
     {
@@ -17,53 +17,51 @@ public class BoxCollisions : MonoBehaviour
     {
         boxType = type;
     }
+
+
     void Start()
     {
         gameManager = FindObjectOfType<GameManager>();
         playerCollisions = FindObjectOfType<PlayerCollisions>();
         boxSpawner = FindObjectOfType<BoxSpawner>();
-        audioSource = GetComponent<AudioSource>();
-        audioSource.enabled = true;
+        // audioSource = GetComponent<AudioSource>();
+        // audioSource.enabled = true;
         if (boxSpawner == null)
         {
             Debug.LogError("BoxSpawner component not found in the scene!");
         }
     }
-    void OnCollisionEnter2D(Collision2D collision)
+    void OnTriggerEnter2D(Collider2D collision)
     {
         // Ensure the box only destroys itself when colliding with the PlayerLauncher
         if (collision.gameObject.CompareTag("PlayerSphere"))
         {
             isActive = false;
-            Vector2 contactPoint = collision.contacts[0].point;
+            Vector2 contactPoint = collision.transform.position;
+
 
             playerCollisions.OnBoxCollision(boxType); // Call method to update score/lives
-            if (boxSpawner != null)
+            // Reference BoxSpawner via Singleton (BoxSpawner.Instance) 
+            if (BoxSpawner.Instance != null)
             {
-                audioSource.Play();
-                StartCoroutine(DelayedBoxDestruction(contactPoint));
+                Debug.Log("BoxSpawner instance found in the scene!");
+                BoxSpawner.Instance.BoxDestroyed(gameObject);
             }
+            else
+            {
+                Debug.LogError("BoxSpawner instance not found in the scene!");
+            }
+            // StartCoroutine(DelayedBoxDestruction(contactPoint));
         }
     }
 
-    private IEnumerator DelayedBoxDestruction(Vector2 contactPoint)
-    {
-        // Wait for the duration of the audio clip
-        yield return new WaitForSeconds(audioSource.clip.length);
+    // private IEnumerator DelayedBoxDestruction(Vector2 contactPoint)
+    // {
 
-        // if (expulsionEffectPrefab != null)
-        // {
-        //     Instantiate(expulsionEffectPrefab, contactPoint, Quaternion.identity);
-        // }
+    //     // Wait for the duration of the audio clip
+    //     yield return new WaitForSeconds(audioSource.clip.length);
 
-        // ParticleSystem particleSystem = expulsionEffectPrefab.GetComponent<ParticleSystem>();
-        // particleSystem.Play();
-        // Destroy the box after the audio has finished playing
-        if (boxSpawner != null)
-        {
-            boxSpawner.BoxDestroyed();
-        }
-    }
+    // }
 
     public void handleCollisionOutsideScreen()
     {
@@ -79,9 +77,13 @@ public class BoxCollisions : MonoBehaviour
                 playerCollisions.UpdateLivesUI();
             }
 
-            if (boxSpawner != null)
+            if (BoxSpawner.Instance != null)
             {
-                boxSpawner.BoxDestroyed();
+                BoxSpawner.Instance.BoxDestroyed(gameObject);
+            }
+            else
+            {
+                Debug.LogError("BoxSpawner instance not found in the scene!");
             }
 
             if (PlayerCollisions.lives <= 0)

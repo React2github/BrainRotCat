@@ -4,16 +4,35 @@ using TMPro;
 using System.Collections;
 public class BoxSpawner : MonoBehaviour
 {
+    public static BoxSpawner Instance { get; private set; }
     public GameObject boxPrefab;  // Reference to the boxPrefab prefab
     public float spawnInterval = 8.5f;  // Time between spawns
     public float xMin = 2f;  // Minimum x-coordinate for spawning
     public float xMax = 6f;  // Maximum x-coordinate for spawning
     public float spawnHeight = 10f; // Height where boxes will spawn from
-    public int maxBoxesPerSpawn = 2; // Maximum number of boxes to spawn at once
+    public int maxBoxesPerSpawn = 3; // Maximum number of boxes to spawn at once
     private PlayerBorder playerBorder;  // Reference to PlayerBorder to get screen edges
     public static float timer;
     public Material[] customBoxMaterials;
+    private GameObject[] allBoxes;
 
+
+    void Awake()
+    {
+        if (Instance == null)
+        {
+            Instance = this; // Set this instance as the Singleton
+        }
+        else
+        {
+            // Deactivate the extra instance rather than destroying it
+            gameObject.SetActive(false); // Disable the extra BoxSpawner instance
+            return; // Exit the Awake method to prevent further execution
+        }
+
+        // Optional: If you want the BoxSpawner to persist across scenes, you can add this
+        DontDestroyOnLoad(gameObject); // Keep the instance alive across scenes if needed
+    }
     void Start()
     {
         playerBorder = FindObjectOfType<PlayerBorder>();
@@ -24,7 +43,7 @@ public class BoxSpawner : MonoBehaviour
         timer += Time.deltaTime;
         IsAnyBoxOnScreen();
 
-        GameObject[] allBoxes = GameObject.FindGameObjectsWithTag("boxPrefab");
+        allBoxes = GameObject.FindGameObjectsWithTag("boxPrefab");
         Debug.Log("Active box count: " + allBoxes.Length);
 
     }
@@ -69,6 +88,63 @@ public class BoxSpawner : MonoBehaviour
                 // Instantiate the new boxPrefab at the random position
                 GameObject newBox = Instantiate(boxPrefab, new Vector2(spawnX, spawnHeight), Quaternion.identity);
 
+                MeshRenderer meshRenderer = newBox.GetComponent<MeshRenderer>();
+                if (meshRenderer == null)
+                {
+                    meshRenderer = newBox.AddComponent<MeshRenderer>();
+                }
+                MeshFilter meshFilter = newBox.GetComponent<MeshFilter>();
+                if (meshFilter == null)
+                {
+                    meshFilter = newBox.AddComponent<MeshFilter>();
+                }
+
+                // Assign the Flash mesh to the MeshFilter
+                Mesh flashMesh = Resources.Load<Mesh>("Flask");
+                if (flashMesh != null)
+                {
+                    meshFilter.mesh = flashMesh;
+                }
+
+
+                // Assign the  material to the MeshRenderer
+                Material Transparent = Resources.Load<Material>("Transparent");
+                if (Transparent != null)
+                {
+                    meshRenderer.material = Transparent;
+                }
+                // Set the scale of the new boxPrefab
+                newBox.transform.localScale = new Vector3(1.33f, newBox.transform.localScale.y, newBox.transform.localScale.z);
+
+                /////////////////////////// Child componenet 
+                // Create the Capsule child object
+                GameObject capsule = new GameObject("Capsule");
+
+                // Set the Capsule as a child of newBox
+                capsule.transform.parent = newBox.transform;
+
+                // Reset the local position to ensure it's properly placed inside newBox
+                capsule.transform.localPosition = new Vector3(0f, 0.06f, 0f);
+
+                // Set the scale of capsule
+                capsule.transform.localScale = new Vector3(0.87f, 0.87f, 0.87f);
+
+                // Add and assign the MeshFilter
+                MeshFilter capsuleMeshFilter = capsule.AddComponent<MeshFilter>();
+                Mesh flaskMesh = Resources.Load<Mesh>("Flask");
+                if (flaskMesh != null)
+                {
+                    capsuleMeshFilter.mesh = flaskMesh;
+                }
+
+                // Add and assign the MeshRenderer
+                MeshRenderer capsuleMeshRenderer = capsule.AddComponent<MeshRenderer>();
+                Material insideLiquidMaterial = Resources.Load<Material>("InsideLquid");
+                if (insideLiquidMaterial != null)
+                {
+                    capsuleMeshRenderer.material = insideLiquidMaterial;
+                }
+
                 // Assign random floatSpeed and acceleration values
                 float randomFloatSpeed = Random.Range(2f, 3f); // Adjust range as needed
                 float randomAcceleration = Random.Range(2f, 3f); // Adjust range as needed
@@ -79,13 +155,21 @@ public class BoxSpawner : MonoBehaviour
                     boxMovement.Initialize(randomFloatSpeed, randomAcceleration, this);
                 }
 
+                BoxCollider2D collider = newBox.GetComponent<BoxCollider2D>();
+                if (collider == null)
+                {
+                    collider = newBox.AddComponent<BoxCollider2D>(); // Add BoxCollider2D if it doesn't exist
+                }
+                collider.isTrigger = true; // Set isTrigger to true
+
+
                 // Randomly select a box type
                 newBox.tag = "boxPrefab"; // Add tag to the new boxPrefab
                 BoxType type = (BoxType)Random.Range(0, System.Enum.GetValues(typeof(BoxType)).Length);
                 SetCapsuleColor(type, newBox);
 
 
-                MeshRenderer meshRenderer = newBox.GetComponent<MeshRenderer>();
+                // MeshRenderer meshRenderer = newBox.GetComponent<MeshRenderer>();
                 // Dynamically determine and assign the material based on BoxType
                 // Material newMaterial = GetMaterialForBoxType(type);
 
@@ -114,7 +198,7 @@ public class BoxSpawner : MonoBehaviour
         if (capsuleTransform != null)
         {
             Renderer capsuleRenderer = capsuleTransform.GetComponent<Renderer>();
-            Transform labelTextTransform = boxPrefab.transform.Find("LabelText");
+            // Transform labelTextTransform = boxPrefab.transform.Find("LabelText");
 
             if (capsuleRenderer != null)
             {
@@ -126,22 +210,22 @@ public class BoxSpawner : MonoBehaviour
                 {
                     case BoxType.AddPoints:
                         baseColor = Color.white;
-                        SetLabelText(labelTextTransform, "");
+                        // SetLabelText(labelTextTransform, "");
                         break;
                     case BoxType.AddMoney:
                         baseColor = Color.yellow;
-                        SetLabelText(labelTextTransform, "150");
+                        // SetLabelText(labelTextTransform, "150");
                         break;
                     case BoxType.MultiplyPoints:
                         baseColor = Color.green;
-                        SetLabelText(labelTextTransform, "100");
+                        // SetLabelText(labelTextTransform, "100");
                         break;
                     case BoxType.RemoveLife:
                         baseColor = Color.black;
-                        SetLabelText(labelTextTransform, "");
+                        // SetLabelText(labelTextTransform, "");
                         break;
                     case BoxType.AddPowerup:
-                        SetLabelText(labelTextTransform, "");
+                        // SetLabelText(labelTextTransform, "");
                         baseColor = Color.red;
                         break;
                 }
@@ -193,18 +277,29 @@ public class BoxSpawner : MonoBehaviour
         }
     }
 
-    public void BoxDestroyed()
+    public void BoxDestroyed(GameObject boxInstance)
     {
-        if (gameObject != null)
+        if (boxInstance != null)
         {
-            gameObject.tag = "Untagged"; // Remove from "boxPrefab" tag to exclude from future searches
-            Destroy(gameObject); // Destroy the boxPrefab
+            Destroy(boxInstance);
+            Debug.Log("Box destroyed!");
         }
 
         // Dynamically count active boxes
-        int boxCount = GameObject.FindGameObjectsWithTag("boxPrefab").Length;
+        // Start a coroutine to wait until the end of the frame
+        StartCoroutine(CheckAndSpawnBoxes());
+    }
 
-        if (boxCount == 0)
+    private IEnumerator CheckAndSpawnBoxes()
+    {
+        // Wait until the end of the frame
+        yield return new WaitForEndOfFrame();
+
+        // Dynamically count active boxes
+        allBoxes = GameObject.FindGameObjectsWithTag("boxPrefab");
+        Debug.Log("Active box count: " + allBoxes.Length);
+
+        if (allBoxes.Length == 0)
         {
             Debug.Log("No active boxes, spawning new boxes...");
             SpawnBoxes(); // Spawn new boxes
